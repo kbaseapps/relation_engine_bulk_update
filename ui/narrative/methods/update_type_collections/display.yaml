@@ -1,0 +1,26 @@
+#
+# define display information
+#
+name: Update Type Collections
+
+tooltip: |
+    Update the type collections with current registered types in WS
+
+screenshots: []
+
+icon: icon.png
+
+#
+# Configure the display and description of parameters
+#
+parameters :
+    parameter_1 :
+        ui-name : |
+            First parameter
+        short-hint : |
+            The first parameter
+        long-hint  : |
+            The first parameter that needs to be entered to drive the method. This might be the first of many.
+
+description : |
+   Update the type collections with current registered types in WS
