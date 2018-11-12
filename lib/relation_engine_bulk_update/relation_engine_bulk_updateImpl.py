@@ -58,7 +58,8 @@ class relation_engine_bulk_update:
         # ctx is the context object
         # return variables are: output
         #BEGIN update_type_collections
-        message = update_type_collections(self.ws, self.re_api_url)
+        message = update_type_collections(self.ws, self.re_api_url, ctx['token'])
+        print(message)
         report_info = self.kb_report.create(
             {'report': {'objects_created': [],
                         'text_message': message},

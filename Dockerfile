@@ -8,7 +8,7 @@ MAINTAINER KBase Developer
 
 # RUN apt-get update
 
-
+RUN conda install ujson
 # -----------------------------------------
 
 COPY ./ /kb/module

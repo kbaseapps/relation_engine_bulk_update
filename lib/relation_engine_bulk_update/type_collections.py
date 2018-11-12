@@ -1,59 +1,37 @@
-import logging
-from collections import OrderedDict
-
-import requests
-
-
-def _load_collection(re_api_url, token, collection, documents, on_duplicate="update"):
-    url = re_api_url + "/documents"
-    headers = {"Authorization": token}
-    payload = {"collection": collection, "on_duplicate": on_duplicate}
-    r = requests.put(url, data="\n".join(documents), headers=headers, params=payload,)
-    r.raise_for_status()
-    results = r.json()
-    logging.info(results)
-    if results['error']:
-        raise RuntimeError(f"Error saving {collection} to Relation Engine API")
-    return (f"{results['created']} documents were added and {results['updated']} documents were "
-            f"modified in {collection} collection. {results['errors']} documents had upload errors.")
+from relation_engine_bulk_update.loader import RELoader
 
 
 def update_type_collections(ws_client, re_api_url, token):
-    message = []
-    collections = OrderedDict([
+    loader = RELoader([
         # vertices
-        ("users", set()),
-        ("type_modules", set()),
-        ("types", set()),
-        ("type_versions", set()),
+        "users",
+        "type_modules",
+        "types",
+        "type_versions",
         # edges
-        ("is_version_of", set()),
-        ("contains", set()),
-        ("is_owner_of", set()),
-        ("is_latest_version_of", set()),
+        "is_version_of",
+        "contains",
+        "is_latest_version_of",
+        "is_owner_of",
     ])
     for module in ws_client.list_all_types({}):
         mod_info = ws_client.get_module_info({"mod": module})
-        collections['type_modules'].add('{"_key": "%s"}' % module)
-        for user in mod_info['owners']:
-            collections['users'].add('{"_key": "%s"}' % user)
-            collections['is_owner_of'].add('{"_from": "users/%s", "_to": "type_modules/%s"}'
-                                           % (user, module))
+        loader.add('type_modules', {'_key': module})
+        for owner in mod_info['owners']:
+            loader.add('users', {'_key': owner})
+            loader.add('is_owner_of', {'_from': f'users/{owner}',
+                                       '_to': f'type_modules/{module}'})
         for ws_type in ws_client.get_all_type_info(module):
             type_id = ws_type['type_def'].split("-")[0]
-            collections['types'].add('{"_key": "%s"}' % type_id)
-            collections['contains'].add('{"_from": "type_modules/%s", "_to": "types/%s"}'
-                                        % (module, type_id))
-            collections['is_latest_version_of'].add(
-                '{"_from": "type_versions/%s", "_to": "types/%s"}'
-                % (ws_type['type_def'], type_id))
+            loader.add('types', {'_key': type_id})
+            loader.add('contains', {'_from': f'type_modules/{module}',
+                                    '_to': f'types/{type_id}'})
+            loader.add('is_latest_version_of', {'_from': f'type_versions/{ws_type["type_def"]}',
+                                                '_to': f'types/{type_id}'})
+
             for type_version in ws_type['type_vers']:
-                collections['type_versions'].add('{"_key": "%s"}' % type_version)
-                collections['is_version_of'].add('{"_from": "type_versions/%s", "_to": "types/%s"}'
-                                                 % (type_version, type_id))
+                loader.add('type_versions', {'_key': type_version})
+                loader.add('is_version_of', {'_from': f'type_versions/{type_version}',
+                                             '_to': f'types/{type_id}'})
 
-    for collect, docs in collections.items():
-        logging.info(f"Uploading {collect} documents to RE API")
-        message.append(_load_collection(re_api_url, token, collect, docs))
-
-    return "\n".join(message)
+    return loader.save_all_to_re(re_api_url, token)
