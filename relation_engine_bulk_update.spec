@@ -9,8 +9,12 @@ module relation_engine_bulk_update {
     } ReportResults;
 
     /*
-        This example function accepts any number of parameters and returns results in a KBaseReport
+        Updates type mappings. Currently only requires a ws_id for the report
     */
     funcdef update_type_collections(mapping<string,UnspecifiedObject> params) returns (ReportResults output) authentication required;
+    /*
+        Updates the provenance relationships for workspace objects. Currently only requires a ws_id for the report
+    */
+    funcdef update_ws_provenance(mapping<string,UnspecifiedObject> params) returns (ReportResults output) authentication required;
 
 };

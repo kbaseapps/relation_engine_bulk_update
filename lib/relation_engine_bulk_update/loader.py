@@ -31,7 +31,6 @@ class RELoader:
         headers = {"Authorization": token}
         payload = {"collection": collection, "on_duplicate": on_duplicate}
         r = requests.put(url, data="\n".join(documents), headers=headers, params=payload, )
-        r.raise_for_status()
         results = r.json()
         logging.info(results)
         if results['error']:

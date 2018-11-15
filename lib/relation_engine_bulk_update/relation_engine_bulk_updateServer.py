@@ -115,11 +115,10 @@ class JSONRPCServiceCustom(JSONRPCService):
             # Exception was raised inside the method.
             newerr = JSONServerError()
             newerr.trace = traceback.format_exc()
-            if isinstance(e.message, str):
-                newerr.data = e.message
+            if len(e.args) == 1:
+                newerr.data = repr(e.args[0])
             else:
-                # Some exceptions embed other exceptions as the message
-                newerr.data = repr(e.message)
+                newerr.data = repr(e.args)
             raise newerr
         return result
 
@@ -343,6 +342,10 @@ class Application(object):
                              name='relation_engine_bulk_update.update_type_collections',
                              types=[dict])
         self.method_authentication['relation_engine_bulk_update.update_type_collections'] = 'required'  # noqa
+        self.rpc_service.add(impl_relation_engine_bulk_update.update_ws_provenance,
+                             name='relation_engine_bulk_update.update_ws_provenance',
+                             types=[dict])
+        self.method_authentication['relation_engine_bulk_update.update_ws_provenance'] = 'required'  # noqa
         self.rpc_service.add(impl_relation_engine_bulk_update.status,
                              name='relation_engine_bulk_update.status',
                              types=[dict])

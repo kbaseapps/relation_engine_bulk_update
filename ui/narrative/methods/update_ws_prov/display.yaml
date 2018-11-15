@@ -1,0 +1,26 @@
+#
+# define display information
+#
+name: Update Workspace Provanence
+
+tooltip: |
+    Update the provanance info for select workspaces in RE
+
+screenshots: []
+
+icon: icon.png
+
+#
+# Configure the display and description of parameters
+#
+parameters :
+    list_ws_params :
+        ui-name : |
+            List Workspace Parameters
+        short-hint : |
+            Params for ListWorkspaceInfoParams as JSON string
+        long-hint  : |
+            Params for ListWorkspaceInfoParams as JSON string. See: https://ci.kbase.us/services/ws/docs/Workspace.html#typedefWorkspace.ListWorkspaceInfoParams
+
+description : |
+   Update the provanance info for select workspaces in RE

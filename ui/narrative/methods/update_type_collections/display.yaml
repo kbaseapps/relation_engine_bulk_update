@@ -16,7 +16,7 @@ icon: icon.png
 parameters :
     parameter_1 :
         ui-name : |
-            First parameter
+            This does nothing
         short-hint : |
             The first parameter
         long-hint  : |

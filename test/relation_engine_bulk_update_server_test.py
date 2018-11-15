@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import os
 import time
+import ujson
 import unittest
 from configparser import ConfigParser
 
@@ -68,6 +69,15 @@ class relation_engine_bulk_updateTest(unittest.TestCase):
         return self.__class__.ctx
 
     # NOTE: According to Python unittest naming rules test method names should start from 'test'. # noqa
+    @unittest.skip
     def test_update_type_collection(self):
         ret = self.getImpl().update_type_collections(self.getContext(),
                                                      {'workspace_name': self.getWsName()})
+    def test_update_ws_prov(self):
+        ret = self.getImpl().update_ws_provenance(self.getContext(), {
+            'workspace_name': self.getWsName(),
+            'list_ws_params': ujson.dumps({
+                'owners': ['jjeffryes'],
+                'after': '2018-10-08T20:26:25+0000'
+            })
+        })

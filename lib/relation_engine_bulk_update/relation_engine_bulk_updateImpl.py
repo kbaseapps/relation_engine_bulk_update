@@ -1,11 +1,13 @@
 # -*- coding: utf-8 -*-
 #BEGIN_HEADER
+import ujson
 import logging
 import os
 
 from installed_clients.KBaseReportClient import KBaseReport
 from installed_clients.WorkspaceClient import Workspace
 from relation_engine_bulk_update.type_collections import update_type_collections
+from relation_engine_bulk_update.workspace_object_collections import update_ws_object_collections
 #END_HEADER
 
 
@@ -25,8 +27,8 @@ class relation_engine_bulk_update:
     # the latter method is running.
     ######################################### noqa
     VERSION = "0.0.1"
-    GIT_URL = ""
-    GIT_COMMIT_HASH = ""
+    GIT_URL = "https://github.com/kbaseapps/relation_engine_bulk_update.git"
+    GIT_COMMIT_HASH = "1bc63ae29a1035a4827043a7f85646562e407337"
 
     #BEGIN_CLASS_HEADER
     # Class variables and functions can be defined in this block
@@ -50,7 +52,7 @@ class relation_engine_bulk_update:
 
     def update_type_collections(self, ctx, params):
         """
-        This example function accepts any number of parameters and returns results in a KBaseReport
+        Updates type mappings. Currently only requires a ws_id for the report
         :param params: instance of mapping from String to unspecified object
         :returns: instance of type "ReportResults" -> structure: parameter
            "report_name" of String, parameter "report_ref" of String
@@ -73,6 +75,37 @@ class relation_engine_bulk_update:
         # At some point might do deeper type checking...
         if not isinstance(output, dict):
             raise ValueError('Method update_type_collections return value ' +
+                             'output is not type dict as required.')
+        # return the results
+        return [output]
+
+    def update_ws_provenance(self, ctx, params):
+        """
+        Updates the provenance relationships for workspace objects. Currently only requires a ws_id for the report
+        :param params: instance of mapping from String to unspecified object
+        :returns: instance of type "ReportResults" -> structure: parameter
+           "report_name" of String, parameter "report_ref" of String
+        """
+        # ctx is the context object
+        # return variables are: output
+        #BEGIN update_ws_provenance
+        parsed_params = ujson.loads(params['list_ws_params'])
+        message = update_ws_object_collections(self.ws, self.re_api_url, ctx['token'],
+                                               parsed_params)
+        print(message)
+        report_info = self.kb_report.create(
+            {'report': {'objects_created': [],
+                        'text_message': message},
+             'workspace_name': params['workspace_name']})
+        output = {
+            'report_name': report_info['name'],
+            'report_ref': report_info['ref'],
+        }
+        #END update_ws_provenance
+
+        # At some point might do deeper type checking...
+        if not isinstance(output, dict):
+            raise ValueError('Method update_ws_provenance return value ' +
                              'output is not type dict as required.')
         # return the results
         return [output]
