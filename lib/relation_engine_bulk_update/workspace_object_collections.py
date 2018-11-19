@@ -117,29 +117,32 @@ def _parse_ws_objects(ws_client, loader, obj_info, obj_key):
             loader.add('was_copied_from', {'_from': f'ws_object_versions/{ver_key}',
                                            '_to': f'ws_object_versions/{copy_key}'})
 
-        if prov.get('method_params'):
-            _proc_creating_method(loader, prov, ver_key)
-
         for ref in prov.get("input_ws_objects", []):
             input_key = ref.replace("/", WS_OBJ_DELIMITER)
             loader.add('was_created_using', {'_from': f'ws_object_versions/{ver_key}',
                                              '_to': f'ws_object_versions/{input_key}'})
 
-        for action in prov.get("subactions", []):
-            # I think these are the results of test images?
-            if action['commit'] == 'local-docker-image':
-                action['commit'] = 'UNDEFINED'
-                action['ver'] = '0.0.0'
-            mod_ver_key = f"{action['name']}:{action['commit']}"
-            loader.add('sdk_module_versions', {'_key': mod_ver_key,
-                                               'name': action['name'],
-                                               'commit': action['commit'],
-                                               'ver': action['ver'].split("-")[0],
-                                               'code_url': action['code_url'],
-                                               })
+        if prov.get('method_params'):
+            _proc_creating_method(loader, prov, ver_key)
 
-            loader.add('was_created_using', {'_from': f'ws_object_versions/{ver_key}',
-                                             '_to': f'sdk_module_versions/{mod_ver_key}'})
+        for action in prov.get("subactions", []):
+            _proc_module_versions(action, loader, ver_key)
+
+
+def _proc_module_versions(action, loader, ver_key):
+    # I think these are the results of test images?
+    if action['commit'] == 'local-docker-image':
+        action['commit'] = 'UNDEFINED'
+        action['ver'] = '0.0.0'
+    mod_ver_key = f"{action['name']}:{action['commit']}"
+    loader.add('sdk_module_versions', {'_key': mod_ver_key,
+                                       'name': action['name'],
+                                       'commit': action['commit'],
+                                       'ver': action['ver'].split("-")[0],
+                                       'code_url': action['code_url'],
+                                       })
+    loader.add('was_created_using', {'_from': f'ws_object_versions/{ver_key}',
+                                     '_to': f'sdk_module_versions/{mod_ver_key}'})
 
 
 def _proc_creating_method(loader, prov, ver_key):
@@ -150,7 +153,19 @@ def _proc_creating_method(loader, prov, ver_key):
     if mod_ver == 'local-docker-image':  # I think these are the results of test images?
         mod_ver = "UNDEFINED"
         prov['service_ver'] = '0.0.0'
-    app_key = f"{prov['service']}:{mod_ver}.{prov['method']}"
+
+    mod_ver_key = f"{prov['service']}:{mod_ver}"
+    app_key = mod_ver_key + f".{prov['method']}"
+
+    loader.add('sdk_module_versions', {'_key': mod_ver_key,
+                                       'name': prov['service'],
+                                       'commit': mod_ver,
+                                       'ver': prov.get('service_ver', '0.0.0'),
+                                       'code_url': 'UNKNOWN',
+                                       })
+
+    loader.add('contains', {'_from': f'sdk_module_versions/{mod_ver_key}',
+                            '_to': f'sdk_module_method_versions/{app_key}'})
 
     loader.add('sdk_module_method_versions', {'_key': app_key,
                                               'module_name': prov['service'],
