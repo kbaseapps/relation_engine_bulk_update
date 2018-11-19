@@ -28,10 +28,20 @@ class relation_engine_bulk_update:
     ######################################### noqa
     VERSION = "0.0.1"
     GIT_URL = "https://github.com/kbaseapps/relation_engine_bulk_update.git"
-    GIT_COMMIT_HASH = "1bc63ae29a1035a4827043a7f85646562e407337"
+    GIT_COMMIT_HASH = "0b7a21b3a6e7df68a3de0bbb1b722889db204364"
 
     #BEGIN_CLASS_HEADER
     # Class variables and functions can be defined in this block
+    def make_report(self, message, ws_id):
+        report_info = self.kb_report.create(
+            {'report': {'objects_created': [],
+                        'text_message': message},
+             'workspace_id': ws_id})
+        return {
+            'report_name': report_info['name'],
+            'report_ref': report_info['ref'],
+        }
+
     #END_CLASS_HEADER
 
     # config contains contents of config file in a hash or None if it couldn't
@@ -61,20 +71,36 @@ class relation_engine_bulk_update:
         # return variables are: output
         #BEGIN update_type_collections
         message = update_type_collections(self.ws, self.re_api_url, ctx['token'])
-        print(message)
-        report_info = self.kb_report.create(
-            {'report': {'objects_created': [],
-                        'text_message': message},
-             'workspace_name': params['workspace_name']})
-        output = {
-            'report_name': report_info['name'],
-            'report_ref': report_info['ref'],
-        }
+        logging.info(message)
+        output = self.make_report(message, params['workspace_id'])
+
         #END update_type_collections
 
         # At some point might do deeper type checking...
         if not isinstance(output, dict):
             raise ValueError('Method update_type_collections return value ' +
+                             'output is not type dict as required.')
+        # return the results
+        return [output]
+
+    def update_sdk_module_collections(self, ctx, params):
+        """
+        Updates sdk module mappings. Currently only requires a ws_id for the report
+        :param params: instance of mapping from String to unspecified object
+        :returns: instance of type "ReportResults" -> structure: parameter
+           "report_name" of String, parameter "report_ref" of String
+        """
+        # ctx is the context object
+        # return variables are: output
+        #BEGIN update_sdk_module_collections
+        message = "Not implemented yet"
+        logging.info(message)
+        output = self.make_report(message, params['workspace_id'])
+        #END update_sdk_module_collections
+
+        # At some point might do deeper type checking...
+        if not isinstance(output, dict):
+            raise ValueError('Method update_sdk_module_collections return value ' +
                              'output is not type dict as required.')
         # return the results
         return [output]
@@ -92,15 +118,8 @@ class relation_engine_bulk_update:
         parsed_params = ujson.loads(params['list_ws_params'])
         message = update_ws_object_collections(self.ws, self.re_api_url, ctx['token'],
                                                parsed_params)
-        print(message)
-        report_info = self.kb_report.create(
-            {'report': {'objects_created': [],
-                        'text_message': message},
-             'workspace_name': params['workspace_name']})
-        output = {
-            'report_name': report_info['name'],
-            'report_ref': report_info['ref'],
-        }
+        logging.info(message)
+        output = self.make_report(message, params['workspace_id'])
         #END update_ws_provenance
 
         # At some point might do deeper type checking...

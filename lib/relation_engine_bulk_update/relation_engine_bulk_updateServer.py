@@ -342,6 +342,10 @@ class Application(object):
                              name='relation_engine_bulk_update.update_type_collections',
                              types=[dict])
         self.method_authentication['relation_engine_bulk_update.update_type_collections'] = 'required'  # noqa
+        self.rpc_service.add(impl_relation_engine_bulk_update.update_sdk_module_collections,
+                             name='relation_engine_bulk_update.update_sdk_module_collections',
+                             types=[dict])
+        self.method_authentication['relation_engine_bulk_update.update_sdk_module_collections'] = 'required'  # noqa
         self.rpc_service.add(impl_relation_engine_bulk_update.update_ws_provenance,
                              name='relation_engine_bulk_update.update_ws_provenance',
                              types=[dict])

@@ -53,14 +53,15 @@ class relation_engine_bulk_updateTest(unittest.TestCase):
     def getWsClient(self):
         return self.__class__.wsClient
 
-    def getWsName(self):
-        if hasattr(self.__class__, 'wsName'):
-            return self.__class__.wsName
-        suffix = int(time.time() * 1000)
-        wsName = "test_relation_engine_bulk_update_" + str(suffix)
-        ret = self.getWsClient().create_workspace({'workspace': wsName})  # noqa
-        self.__class__.wsName = wsName
-        return wsName
+    def getWsId(self):
+        if not hasattr(self.__class__, 'wsName'):
+            suffix = int(time.time() * 1000)
+            wsName = "test_relation_engine_bulk_update_" + str(suffix)
+            ret = self.getWsClient().create_workspace({'workspace': wsName})  # noqa
+            self.__class__.wsName = wsName
+            self.__class__.wsId = ret[0]
+        return self.__class__.wsId
+
 
     def getImpl(self):
         return self.__class__.serviceImpl
@@ -70,14 +71,20 @@ class relation_engine_bulk_updateTest(unittest.TestCase):
 
     # NOTE: According to Python unittest naming rules test method names should start from 'test'. # noqa
     @unittest.skip
-    def test_update_type_collection(self):
+    def test_update_type_collections(self):
         ret = self.getImpl().update_type_collections(self.getContext(),
-                                                     {'workspace_name': self.getWsName()})
+                                                     {'workspace_id': self.getWsId()})
+
+    @unittest.skip
     def test_update_ws_prov(self):
         ret = self.getImpl().update_ws_provenance(self.getContext(), {
-            'workspace_name': self.getWsName(),
+            'workspace_id': self.getWsId(),
             'list_ws_params': ujson.dumps({
                 'owners': ['jjeffryes'],
-                'after': '2018-10-08T20:26:25+0000'
+                'after': '2018-11-18T20:26:25+0000'
             })
         })
+
+    def test_update_module_collections(self):
+        ret = self.getImpl().update_sdk_module_collections(self.getContext(),
+                                                           {'workspace_id': self.getWsId()})
