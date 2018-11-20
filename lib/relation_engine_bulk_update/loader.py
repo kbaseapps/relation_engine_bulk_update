@@ -31,8 +31,8 @@ class RELoader:
         headers = {"Authorization": token}
         payload = {"collection": collection, "on_duplicate": on_duplicate}
         r = requests.put(url, data="\n".join(documents), headers=headers, params=payload, )
+        logging.info(f"{collection}: {r.text}")
         results = r.json()
-        logging.info(results)
         if results['error']:
             raise RuntimeError(f"Error saving {collection} to Relation Engine API")
         return (f"{results['created']} documents were added and {results['updated']} documents "

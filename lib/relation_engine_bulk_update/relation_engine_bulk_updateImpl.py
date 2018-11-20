@@ -4,10 +4,12 @@ import ujson
 import logging
 import os
 
+from installed_clients.CatalogClient import Catalog
 from installed_clients.KBaseReportClient import KBaseReport
 from installed_clients.WorkspaceClient import Workspace
 from relation_engine_bulk_update.type_collections import update_type_collections
 from relation_engine_bulk_update.workspace_object_collections import update_ws_object_collections
+from relation_engine_bulk_update.sdk_module_collections import update_sdk_module_collections
 #END_HEADER
 
 
@@ -53,6 +55,7 @@ class relation_engine_bulk_update:
         self.callback_url = os.environ['SDK_CALLBACK_URL']
         self.shared_folder = config['scratch']
         self.re_api_url = config['re-api-url']
+        self.catalog = Catalog(config['catalog-url'])
         self.ws = Workspace(config['workspace-url'])
         self.kb_report = KBaseReport(self.callback_url)
         logging.basicConfig(level=logging.INFO)
@@ -93,7 +96,7 @@ class relation_engine_bulk_update:
         # ctx is the context object
         # return variables are: output
         #BEGIN update_sdk_module_collections
-        message = "Not implemented yet"
+        message = update_sdk_module_collections(self.catalog, self.re_api_url, ctx['token'])
         logging.info(message)
         output = self.make_report(message, params['workspace_id'])
         #END update_sdk_module_collections
