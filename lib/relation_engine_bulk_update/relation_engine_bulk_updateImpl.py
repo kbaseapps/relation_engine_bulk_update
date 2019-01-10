@@ -7,6 +7,8 @@ import os
 from installed_clients.CatalogClient import Catalog
 from installed_clients.KBaseReportClient import KBaseReport
 from installed_clients.WorkspaceClient import Workspace
+
+from relation_engine_bulk_update.genome_collections import update_ncbi_genomes
 from relation_engine_bulk_update.type_collections import update_type_collections
 from relation_engine_bulk_update.workspace_object_collections import update_ws_object_collections
 from relation_engine_bulk_update.sdk_module_collections import update_sdk_module_collections
@@ -30,7 +32,7 @@ class relation_engine_bulk_update:
     ######################################### noqa
     VERSION = "0.0.1"
     GIT_URL = "https://github.com/kbaseapps/relation_engine_bulk_update.git"
-    GIT_COMMIT_HASH = "0b7a21b3a6e7df68a3de0bbb1b722889db204364"
+    GIT_COMMIT_HASH = "06f2ee2bace04fe55436309e114de1300aed5c66"
 
     #BEGIN_CLASS_HEADER
     # Class variables and functions can be defined in this block
@@ -128,6 +130,28 @@ class relation_engine_bulk_update:
         # At some point might do deeper type checking...
         if not isinstance(output, dict):
             raise ValueError('Method update_ws_provenance return value ' +
+                             'output is not type dict as required.')
+        # return the results
+        return [output]
+
+    def update_ncbi_genomes(self, ctx, params):
+        """
+        Updates the ncbi_genomes. Currently only requires a ws_id for the report and a list of genome_names
+        :param params: instance of mapping from String to unspecified object
+        :returns: instance of type "ReportResults" -> structure: parameter
+           "report_name" of String, parameter "report_ref" of String
+        """
+        # ctx is the context object
+        # return variables are: output
+        #BEGIN update_ncbi_genomes
+        message = update_ncbi_genomes(self.ws, self.re_api_url, ctx['token'], params)
+        logging.info(message)
+        output = {}
+        #END update_ncbi_genomes
+
+        # At some point might do deeper type checking...
+        if not isinstance(output, dict):
+            raise ValueError('Method update_ncbi_genomes return value ' +
                              'output is not type dict as required.')
         # return the results
         return [output]

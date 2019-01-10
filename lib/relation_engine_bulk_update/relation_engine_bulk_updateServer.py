@@ -350,6 +350,10 @@ class Application(object):
                              name='relation_engine_bulk_update.update_ws_provenance',
                              types=[dict])
         self.method_authentication['relation_engine_bulk_update.update_ws_provenance'] = 'required'  # noqa
+        self.rpc_service.add(impl_relation_engine_bulk_update.update_ncbi_genomes,
+                             name='relation_engine_bulk_update.update_ncbi_genomes',
+                             types=[dict])
+        self.method_authentication['relation_engine_bulk_update.update_ncbi_genomes'] = 'required'  # noqa
         self.rpc_service.add(impl_relation_engine_bulk_update.status,
                              name='relation_engine_bulk_update.status',
                              types=[dict])

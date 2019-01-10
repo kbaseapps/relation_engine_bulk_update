@@ -21,4 +21,9 @@ module relation_engine_bulk_update {
     */
     funcdef update_ws_provenance(mapping<string,UnspecifiedObject> params) returns (ReportResults output) authentication required;
 
+    /*
+        Updates the ncbi_genomes. Currently only requires a ws_id for the report and a list of genome_names
+    */
+    funcdef update_ncbi_genomes(mapping<string,UnspecifiedObject> params) returns (ReportResults output) authentication required;
+
 };

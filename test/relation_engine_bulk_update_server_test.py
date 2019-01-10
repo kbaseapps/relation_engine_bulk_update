@@ -63,21 +63,15 @@ class relation_engine_bulk_updateTest(unittest.TestCase):
         return self.__class__.wsId
 
 
-    def getImpl(self):
-        return self.__class__.serviceImpl
-
-    def getContext(self):
-        return self.__class__.ctx
-
     # NOTE: According to Python unittest naming rules test method names should start from 'test'. # noqa
     @unittest.skip
     def test_update_type_collections(self):
-        ret = self.getImpl().update_type_collections(self.getContext(),
+        ret = self.serviceImpl.update_type_collections(self.ctx,
                                                      {'workspace_id': self.getWsId()})
 
     @unittest.skip
     def test_update_ws_prov(self):
-        ret = self.getImpl().update_ws_provenance(self.getContext(), {
+        ret = self.serviceImpl.update_ws_provenance(self.ctx, {
             'workspace_id': self.getWsId(),
             'list_ws_params': ujson.dumps({
                 'owners': ['jjeffryes'],
@@ -85,6 +79,13 @@ class relation_engine_bulk_updateTest(unittest.TestCase):
             })
         })
 
+    @unittest.skip
     def test_update_module_collections(self):
-        ret = self.getImpl().update_sdk_module_collections(self.getContext(),
+        ret = self.serviceImpl.update_sdk_module_collections(self.ctx,
                                                            {'workspace_id': self.getWsId()})
+
+    def test_update_genome_collections(self):
+        with open('kegg_genomes.txt') as infile:
+            genome_list = list(infile.readlines())
+        ret = self.serviceImpl.update_ncbi_genomes(self.ctx, {'workspace_id': self.getWsId(),
+                                                              'genomes': genome_list})
