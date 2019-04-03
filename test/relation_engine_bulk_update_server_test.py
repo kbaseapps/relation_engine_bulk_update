@@ -85,7 +85,7 @@ class relation_engine_bulk_updateTest(unittest.TestCase):
                                                            {'workspace_id': self.getWsId()})
 
     def test_update_genome_collections(self):
-        with open('kegg_genomes.txt') as infile:
+        with open('data/all_kegg_only.txt') as infile:
             genome_list = list(infile.readlines())
         ret = self.serviceImpl.update_ncbi_genomes(self.ctx, {'workspace_id': self.getWsId(),
                                                               'genomes': genome_list})
